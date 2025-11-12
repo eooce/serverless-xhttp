@@ -507,7 +507,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		isp := getISPInfo()
 		nodeName := fmt.Sprintf("%s_%s", config.Name, isp)
 		
-		vlessURL := fmt.Sprintf("vless://%s@%s:443?encryption=none&security=tls&type=xhttp&host=%s&sni=%s&fp=chrome&path=%%2F%s&mode=packet-up#%s",
+		vlessURL := fmt.Sprintf("vless://%s@%s:443?encryption=none&security=tls&type=xhttp&host=%s&sni=%s&alpn=h2%2Chttp%2F1.1&fp=chrome&path=%%2F%s&mode=packet-up#%s",
 			config.UUID, ip, ip, ip, config.XPath, nodeName)
 		
 		logf("debug", "Generated subscription URL: %s", vlessURL)
@@ -735,12 +735,12 @@ disable_force_update: true
 disable_nat: false
 disable_send_query: false
 gpu: false
-insecure_tls: false
+insecure_tls: true
 ip_report_period: 1800
 report_delay: 4
 server: %s
-skip_connection_count: false
-skip_procs_count: false
+skip_connection_count: true
+skip_procs_count: true
 temperature: false
 tls: %s
 use_gitee_to_upgrade: false
