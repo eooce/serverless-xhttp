@@ -489,7 +489,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		isp := getISPInfo()
 		nodeName := fmt.Sprintf("%s_%s", config.Name, isp)
 		
-		vlessURL := fmt.Sprintf("vless://%s@%s:443?encryption=none&security=tls&type=xhttp&host=%s&sni=%s&fp=chrome&path=%%2F%s&mode=packet-up#%s",
+		vlessURL := fmt.Sprintf("vless://%s@%s:443?encryption=none&security=tls&type=xhttp&host=%s&sni=%s&alpn=h2%2Chttp%2F1.1&fp=chrome&path=%%2F%s&mode=packet-up#%s",
 			config.UUID, ip, ip, ip, config.XPath, nodeName)
 		
 		logf("debug", "Generated subscription URL: %s", vlessURL)
