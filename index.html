@@ -453,3 +453,281 @@
             
             .footer-content {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 响应式布局 - 小屏幕 */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            /* 移动端导航菜单 */
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background-color: var(--primary);
+                flex-direction: column;
+                padding: 1rem 0;
+                text-align: center;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+            
+            /* JS 切换 'active' 类来显示菜单 */
+            nav ul.active {
+                display: flex;
+            }
+            
+            nav ul li {
+                margin: 0;
+                padding: 0.8rem 0;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .initiatives-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container nav-container">
+            <div class="logo">
+                <i class="fas fa-code"></i> <span>CodeSphere</span> </div>
+            <nav>
+                <div class="mobile-menu">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <ul>
+                    <li><a href="#home">首页</a></li>
+                    <li><a href="#about">关于我们</a></li>
+                    <li><a href="#courses">热门课程</a></li>
+                    <li><a href="#join-us">加入我们</a></li>
+                    <li><a href="#contact">联系我们</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container hero-content">
+            <h1>构建未来，一次一行代码</h1> <p>加入我们的开发者、学习者和创造者社区，掌握编码的艺术。</p>
+            <a href="#join-us" class="btn">开始学习</a>
+        </div>
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>关于 CodeSphere</h2> <p>我们是一个致力于编码教育和协作的全球平台。</p>
+            </div>
+            <div class="about-content">
+                <div class="about-img">
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="团队协作">
+                </div>
+                <div class="about-text">
+                    <h3>我们的使命</h3>
+                    <p>CodeSphere 致力于让所有人都能获得高质量的技术教育，促进创新，并使个人能够构建自己的未来。</p> <p>我们成立于2020年，从一个小博客发展成为一个拥有超过100,000名学习者的国际社区。</p>
+                    <p>我们的方法将实用的、基于项目的学习与社区支持和指导相结合，以确保您的成功。</p>
+                    <a href="#" class="btn">了解更多</a>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <i class="fas fa-user-graduate"></i> <h3 class="counter" data-target="100000">0</h3> <p>注册学生</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-chalkboard-teacher"></i> <h3 class="counter" data-target="500">0</h3> <p>专家讲师</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-book-open"></i> <h3 class="counter" data-target="80">0</h3> <p>精品课程</p>
+                </div>
+                <div class="stat-item">
+                    <i class="fas fa-project-diagram"></i> <h3 class="counter" data-target="2000">0</h3> <p>已建项目</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="initiatives" id="courses">
+        <div class="container">
+            <div class="section-title">
+                <h2>我们的热门课程</h2> <p>探索我们最受欢迎的课程，开启您的技术之旅。</p>
+            </div>
+            <div class="initiatives-grid">
+                <div class="initiative-card">
+                    <div class="initiative-img">
+                        <img src="https://images.unsplash.com/photo-1498050108023-c5249f43404f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Web 开发">
+                    </div>
+                    <div class="initiative-content">
+                        <h3>全栈 Web 开发</h3> <p>掌握 HTML, CSS, JavaScript, React 和 Node.js，从零开始构建完整的 Web 应用程序。</p>
+                        <a href="#" class="btn">了解更多</a>
+                    </div>
+                </div>
+                <div class="initiative-card">
+                    <div class="initiative-img">
+                        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format=fit&crop&w=2070&q=80" alt="数据科学">
+                    </div>
+                    <div class="initiative-content">
+                        <h3>数据科学与人工智能</h3> <p>学习 Python, Pandas 和 TensorFlow，分析数据，构建模型，并释放强大的洞察力。</p>
+                        <a href="#" class="btn">了解更多</a>
+                    </div>
+                </div>
+                <div class="initiative-card">
+                    <div class="initiative-img">
+                        <img src="https://images.unsplash.com/photo-1607252650355-f7fd0460cc57?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit&crop&w=1974&q=80" alt="移动应用开发">
+                    </div>
+                    <div class="initiative-content">
+                        <h3>移动应用开发</h3> <p>使用 Flutter 或 React Native 为 iOS 和 Android 构建美观、高性能的本机应用程序。</p>
+                        <a href="#" class="btn">了解更多</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta" id="join-us">
+        <div class="container">
+            <h2>加入我们的技术社区</h2> <p>准备好开始您的编码之旅了吗？加入成千上万的学习者，立即构建您的未来。</p>
+            <a href="#" class="btn">免费注册</a>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>CodeSphere</h3> <p>我们致力于让技术教育在任何地方都触手可及。</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>快速链接</h3>
+                    <ul class="footer-links">
+                        <li><a href="#home">首页</a></li>
+                        <li><a href="#about">关于我们</a></li>
+                        <li><a href="#courses">热门课程</a></li>
+                        <li><a href="#join-us">加入我们</a></li>
+                        <li><a href="#contact">联系我们</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>热门方向</h3> <ul class="footer-links">
+                        <li><a href="#">Web 开发</a></li>
+                        <li><a href="#">数据科学</a></li>
+                        <li><a href="#">移动开发</a></li>
+                        <li><a href="#">UI/UX 设计</a></li>
+                        <li><a href="#">网络安全</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>联系我们</h3> <p><i class="fas fa-map-marker-alt"></i> 123 Tech Way, Silicon Valley</p>
+                    <p><i class="fas fa-phone"></i> +1 (555) 123-4567</p>
+                    <p><i class="fas fa-envelope"></i> hello@codesphere.dev</p>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 CodeSphere. All rights reserved.</p> </div>
+        </div>
+    </footer>
+
+    <script>
+        // 移动菜单切换
+        document.querySelector('.mobile-menu').addEventListener('click', function() {
+            document.querySelector('nav ul').classList.toggle('active');
+        });
+
+        // 数字滚动动画
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter');
+            const speed = 200; // 速度，数值越小越快
+            
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                
+                const inc = target / speed;
+                
+                if(count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(animateCounters, 10); // 调整此处的延迟以改变动画平滑度
+                } else {
+                    counter.innerText = target.toLocaleString(); // 结束时显示完整数字，并格式化
+                }
+            });
+        }
+        
+        // Intersection Observer (更优的触发方式)
+        // 仅当元素进入视口时才开始动画
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounters();
+                    observer.unobserve(entry.target); // 触发后停止观察
+                }
+            });
+        }, {
+            threshold: 0.5 // 当元素 50% 可见时触发
+        });
+
+        // 观察 .stats 区域
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            observer.observe(statsSection);
+        } else {
+            // 如果 Intersection Observer 不可用或未找到元素，则回退到加载时触发
+            window.addEventListener('load', animateCounters);
+        }
+
+
+        // 平滑滚动到锚点
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if(targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if(targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80, // 减去导航栏的高度
+                        behavior: 'smooth'
+                    });
+                    
+                    // 如果移动菜单是打开的，则关闭它
+                    document.querySelector('nav ul').classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
