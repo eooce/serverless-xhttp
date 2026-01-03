@@ -442,40 +442,63 @@ func handleVlessPost(w http.ResponseWriter, r *http.Request, uuid string, seq in
 	w.WriteHeader(http.StatusOK)
 }
 
-// get ISP info from Cloudflare
+// get ISP info from ip.sb
 func getISPInfo() string {
 	client := &http.Client{
-		Timeout: 10 * time.Second,
+		Timeout: 8 * time.Second,
 	}
-	
-	resp, err := client.Get("https://speed.cloudflare.com/meta")
+	req, err := http.NewRequest("GET", "https://api.ip.sb/geoip", nil)
 	if err != nil {
-		logf("warn", "Failed to get ISP info from Cloudflare: %v", err)
+		logf("warn", "Failed to create request: %v", err)
+		return "Unknown_ISP"
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+	req.Header.Set("Accept", "application/json")
+	
+	resp, err := client.Do(req)
+	if err != nil {
 		return "Unknown_ISP"
 	}
 	defer resp.Body.Close()
 	
+	if resp.StatusCode != http.StatusOK {
+		return "Unknown_ISP"
+	}
+	
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		logf("warn", "Failed to read ISP response: %v", err)
 		return "Unknown_ISP"
 	}
 	
-	var meta CloudflareSpeedMeta
-	if err := json.Unmarshal(body, &meta); err != nil {
-		logf("warn", "Failed to parse ISP response: %v", err)
+	type IPSBGeoIP struct {
+		CountryCode string `json:"country_code"`
+		ISP         string `json:"isp"`
+	}
+	
+	var geoInfo IPSBGeoIP
+	if err := json.Unmarshal(body, &geoInfo); err != nil {
+		logf("warn", "Failed to parse ISP response: %v, body: %s", err, string(body))
 		return "Unknown_ISP"
 	}
 	
-	country := strings.ReplaceAll(meta.Country, " ", "")
-	asOrg := strings.ReplaceAll(meta.AsOrganization, " ", "_")
-	asOrg = strings.ReplaceAll(asOrg, "(", "")
-	asOrg = strings.ReplaceAll(asOrg, ")", "")
+	if geoInfo.CountryCode == "" || geoInfo.ISP == "" {
+		logf("warn", "Incomplete data from ip.sb: CountryCode: %s, ISP: %s", 
+			geoInfo.CountryCode, geoInfo.ISP)
+		return "Unknown_ISP"
+	}
+	country := strings.ReplaceAll(geoInfo.CountryCode, " ", "")
+	isp := strings.ReplaceAll(geoInfo.ISP, " ", "_")
+	isp = strings.ReplaceAll(isp, "(", "")
+	isp = strings.ReplaceAll(isp, ")", "")
+	isp = strings.ReplaceAll(isp, ",", "")
+	isp = strings.ReplaceAll(isp, ".", "")
+	isp = strings.ReplaceAll(isp, "/", "_")
 	
-	isp := fmt.Sprintf("%s_%s", country, asOrg)
-	logf("debug", "Got ISP info: %s (Country: %s, ASOrganization: %s)", isp, meta.Country, meta.AsOrganization)
+	result := fmt.Sprintf("%s_%s", country, isp)
+	logf("debug", "Got ISP info: %s (CountryCode: %s, ISP: %s)", 
+		result, geoInfo.CountryCode, geoInfo.ISP)
 	
-	return isp
+	return result
 }
 
 // http server
