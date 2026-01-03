@@ -1100,17 +1100,11 @@ class Session {
 // 获取ISP信息
 async function getISPInfo() {
     try {
-        const response = await axios.get('https://speed.cloudflare.com/meta', {
-            timeout: 8000,
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-            }
-        });
-        
+        const response = await axios.get('https://api.ip.sb/geoip', { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36', timeout: 5000 }});
         const data = response.data;
-        const country = data.country || 'Unknown';
-        const asOrganization = data.asOrganization || 'Unknown';
-        const isp = `${country}-${asOrganization}`.replace(/[^a-zA-Z0-9\-_]/g, '_');
+        const country = data.country_code || 'Unknown';
+        const org = data.isp || 'Unknown';
+        const isp = `${country}-${org}`.replace(/[^a-zA-Z0-9\-_]/g, '_');
         
         log('info', `ISP info obtained: ${isp}`);
         return isp;
