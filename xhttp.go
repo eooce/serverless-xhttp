@@ -34,11 +34,6 @@ type VlessSession struct {
 	mu             sync.Mutex
 }
 
-type CloudflareSpeedMeta struct {
-	Country        string `json:"country"`
-	AsOrganization string `json:"asOrganization"`
-}
-
 var (
 	config       *Config
 	sessions     = make(map[string]*VlessSession)
@@ -54,7 +49,7 @@ func init() {
 func loadConfig() *Config {
 	uuid := getEnv("UUID", "a2056d0d-c98e-4aeb-9aab-37f64edd5710")  // UUID
 	subPath := getEnv("SUB_PATH", "sub")         // 节点订阅token
-	name := getEnv("NAME", "Xhttp")              // 节点名称
+	name := getEnv("NAME", "")                   // 节点名称
 	port := getEnv("PORT", "3000")               // 监听端口
 	domain := getEnv("DOMAIN", "")               // 服务域名
 	xpath := getEnv("XPATH", uuid[:8])
@@ -429,6 +424,7 @@ func getISPInfo() string {
 	client := &http.Client{
 		Timeout: 8 * time.Second,
 	}
+	
 	req, err := http.NewRequest("GET", "https://api.ip.sb/geoip", nil)
 	if err != nil {
 		logf("warn", "Failed to create request: %v", err)
@@ -439,16 +435,19 @@ func getISPInfo() string {
 	
 	resp, err := client.Do(req)
 	if err != nil {
+		logf("warn", "Failed to get ISP info from ip.sb: %v", err)
 		return "Unknown_ISP"
 	}
 	defer resp.Body.Close()
 	
 	if resp.StatusCode != http.StatusOK {
+		logf("warn", "ip.sb returned status code: %d", resp.StatusCode)
 		return "Unknown_ISP"
 	}
 	
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		logf("warn", "Failed to read ISP response: %v", err)
 		return "Unknown_ISP"
 	}
 	
@@ -468,6 +467,7 @@ func getISPInfo() string {
 			geoInfo.CountryCode, geoInfo.ISP)
 		return "Unknown_ISP"
 	}
+	
 	country := strings.ReplaceAll(geoInfo.CountryCode, " ", "")
 	isp := strings.ReplaceAll(geoInfo.ISP, " ", "_")
 	isp = strings.ReplaceAll(isp, "(", "")
@@ -510,14 +510,29 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 		}
 		
 		isp := getISPInfo()
-		nodeName := fmt.Sprintf("%s_%s", config.Name, isp)
+		var nodeName string
+		if config.Name == "" {
+			nodeName = isp
+		} else {
+			nodeName = fmt.Sprintf("%s-%s", config.Name, isp)
+		}
+	
+	var port string
+	var security string
+	if config.Domain != "" && config.Port == "3000" {
+		port = "443"
+		security = "tls"
+	} else {
+		port = config.Port
+		security = "none"
+	}
+	
+	vlessURL := fmt.Sprintf("vless://%s@%s:%s?encryption=none&security=%s&type=xhttp&host=%s&sni=%s&alpn=h2%%2Chttp%%2F1.1&fp=chrome&path=/%s&mode=packet-up#%s",
+		config.UUID, ip, port, security, ip, ip, config.XPath, nodeName)
 		
-		vlessURL := fmt.Sprintf("vless://%s@%s:443?encryption=none&security=tls&type=xhttp&host=%s&sni=%s&alpn=h2%2Chttp%2F1.1&fp=chrome&path=%%2F%s&mode=packet-up#%s",
-			config.UUID, ip, ip, ip, config.XPath, nodeName)
+	logf("debug", "Generated subscription URL: %s", vlessURL)
 		
-		logf("debug", "Generated subscription URL: %s", vlessURL)
-		
-		base64Content := base64.StdEncoding.EncodeToString([]byte(vlessURL))
+	base64Content := base64.StdEncoding.EncodeToString([]byte(vlessURL))
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		fmt.Fprintf(w, "%s\n", base64Content)
@@ -650,4 +665,3 @@ func main() {
 		logf("error", "Server error: %v", err)
 	}
 }
-
