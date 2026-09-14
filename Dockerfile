@@ -1,14 +1,21 @@
-FROM node:20.11.1-alpine3.19
+FROM python:3.13-slim
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 
 
 WORKDIR /app
 
-COPY package.json ./
-COPY app.js ./
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app.py ./
 
 EXPOSE 3000
 
-RUN apk add --no-cache curl bash && \
-    npm install && \
-    chmod +x app.js
-
-CMD ["npm", "start"]
+CMD ["python", "app.py"]
