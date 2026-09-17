@@ -2,15 +2,14 @@
 
 # VLESS-XHTTP Proxy Server
 
-[![npm version](https://img.shields.io/npm/v/@eooce/xhttp?style=flat-square)](https://www.npmjs.com/package/@eooce/xhttp)
-[![npm downloads](https://img.shields.io/npm/dm/@eooce/xhttp?style=flat-square)](https://www.npmjs.com/package/@eooce/xhttp)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue?style=flat-square)
 [![GitHub stars](https://img.shields.io/github/stars/eooce/serverless-xhttp?style=social)](https://github.com/eooce/serverless-xhttp)
 [![GitHub forks](https://img.shields.io/github/forks/eooce/serverless-xhttp?style=social)](https://github.com/eooce/serverless-xhttp)
 [![GitHub issues](https://img.shields.io/github/issues/eooce/serverless-xhttp)](https://github.com/eooce/serverless-xhttp/issues)
 [![GitHub license](https://img.shields.io/github/license/eooce/serverless-xhttp)](https://github.com/eooce/serverless-xhttp/blob/main/LICENSE)
 
 
-一个高性能的VLESS-XHTTP代理服务器，基于Node.js实现，支持主流客户端
+一个高性能的VLESS-XHTTP代理服务器，基于 Python asyncio 实现，单文件、零 Web 框架依赖，支持主流客户端
 
 </div>
 
@@ -30,16 +29,17 @@
 | 变量名 | 默认值 | 说明 |
 |--------|--------|------|
 | `UUID` | `a2056d0d-c98e-4aeb-9aab-37f64edd5710` | UUID |
-| `NEZHA_SERVER` |  | 哪吒面板地址 v0: 域名 v1: 域名:端口|
-| `NEZHA_PORT` |    | 哪吒端口 (v0版本使用) |
+| `NEZHA_SERVER` |  | 哪吒面板地址 v0: 域名 v1: 域名:端口 |
 | `NEZHA_KEY` |     | 哪吒密钥 |
-| `AUTO_ACCESS` | `false` | 自动保活开关 |
-| `XPATH` | UUID前8位 | XHTTP路径 |
+| `AUTO_ACCESS` | `false` | 自动保活开关（需配合 `DOMAIN`） |
 | `SUB_PATH` | `sub` | 订阅路径 |
-| `DOMAIN` |   | 服务器域名或IP |
+| `DOMAIN` |   | 服务器域名或IP，设置后订阅节点使用 TLS:443 |
 | `NAME` |     | 节点名称 |
 | `PORT` | `3000` | HTTP服务端口 |
 | `LOG_LEVEL` | `none` | 日志级别 (none/debug/info/warn/error) |
+| `MAX_CONNECTIONS` | `1000` | 最大并发连接数 |
+
+> 说明：XHTTP 路径由 UUID 去掉 `-` 后的前 8 位自动生成，不可通过环境变量修改。
 
 ### 订阅链接
 * HTTP: `http://your-domain.com:${PORT}/${SUB_PATH}`
@@ -79,8 +79,8 @@ function getRandomArray(array) {
 git clone https://github.com/eooce/serverless-xhttp
 cd serverless-xhttp
 
-# 2. 安装依赖
-npm install
+# 2. 安装依赖（需要 Python 3.9+）
+pip install -r requirements.txt
 
 # 3. 配置环境变量（可选）
 export UUID=your-uuid-here
@@ -89,58 +89,51 @@ export NAME=MyNode
 export LOG_LEVEL=none
 
 # 4. 启动服务
-# 基本启动
-node app.js
-
-# 推荐启动（启用垃圾回收）
-node --expose-gc app.js
-
-# 生产环境启动（设置内存限制）
-node --expose-gc --max-old-space-size=512 app.js
+python app.py
 ```
 
-#### 使用PM2管理（推荐）
+#### 使用 systemd 管理（推荐）
 
 ```bash
-# 安装PM2
-npm install -g pm2
+# 创建服务文件
+cat > /etc/systemd/system/xhttp.service << EOF
+[Unit]
+Description=VLESS-XHTTP Proxy Server
+After=network.target
 
-# 创建PM2配置文件
-cat > ecosystem.config.js << EOF
-module.exports = {
-  apps: [{
-    name: 'xhttp',
-    script: 'app.js',
-    node_args: '--expose-gc --max-old-space-size=512',
-    env: {
-      UUID: 'your-uuid-here',
-      DOMAIN: 'your-domain.com',
-      NAME: 'MyNode',
-      LOG_LEVEL: 'info'
-    },
-    instances: 1,
-    autorestart: true,
-    watch: false,
-    max_memory_restart: '1G'
-  }]
-}
+[Service]
+WorkingDirectory=/opt/serverless-xhttp
+Environment=UUID=your-uuid-here
+Environment=DOMAIN=your-domain.com
+Environment=NAME=MyNode
+Environment=LOG_LEVEL=none
+ExecStart=/usr/bin/python3 app.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
 EOF
 
 # 启动服务
-pm2 start ecosystem.config.js
+systemctl daemon-reload
+systemctl enable --now xhttp
 
 # 查看状态
-pm2 status
+systemctl status xhttp
 
 # 查看日志
-pm2 logs vless-xhttp
+journalctl -u xhttp -f
 ```
 
 ### 2：Docker部署
 
-#### 使用预构建镜像
+#### 构建镜像并运行
 
 ```bash
+# 构建镜像
+docker build -t xhttp:latest .
+
 # 完整配置运行
 docker run -d \
   --name vless-proxy \
@@ -151,18 +144,17 @@ docker run -d \
   -e NEZHA_SERVER=your-nezha-server.com \
   -e NEZHA_KEY=your-nezha-key \
   --restart=unless-stopped \
-  ghcr.io/eooce/xhttp:latest
+  xhttp:latest
 ```
 
 #### 使用Docker Compose
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
-
 services:
   xhttp:
-    image: ghcr.io/eooce/xhttp:latest
+    build: .
+    image: xhttp:latest
     container_name: xhttp
     ports:
       - "3000:3000"
@@ -176,14 +168,14 @@ services:
 ```
 
 ```bash
-# 启动服务
-docker-compose up -d
+# 构建并启动服务
+docker compose up -d --build
 
 # 查看日志
-docker-compose logs -f
+docker compose logs -f
 
 # 停止服务
-docker-compose down
+docker compose down
 ```
 
 ---
