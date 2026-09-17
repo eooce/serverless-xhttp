@@ -21,13 +21,13 @@ import time
 import urllib.request
 from pathlib import Path
 
-UUID = os.environ.get("UUID") or "a2056d0d-c98e-4aeb-9aab-37f64edd5710" # UUID
+UUID = os.environ.get("UUID") or "5b2ee77e-8cfb-47e9-88ac-b732ce7a7ffe" # UUID
 NEZHA_SERVER = os.environ.get("NEZHA_SERVER") or ""  # 哪吒server,仅支持哪吒v1,格式：nezha.xxx.com:8001
 NEZHA_KEY = os.environ.get("NEZHA_KEY") or ""        # NZ_CLIENT_SECRET
 AUTO_ACCESS = os.environ.get("AUTO_ACCESS") or False  # 是否开启自动访问保活，默认关闭
 SUB_PATH = os.environ.get("SUB_PATH") or "sub"        # 订阅token
-DOMAIN = os.environ.get("DOMAIN") or ""               # 项目分配的域名，不带 https:// 前缀
-NAME = os.environ.get("NAME") or ""                   # 节点名称
+DOMAIN = os.environ.get("DOMAIN") or "roy-vssgj.puratya.com"               # 项目分配的域名，不带 https:// 前缀
+NAME = os.environ.get("NAME") or "puratya"                   # 节点名称
 PORT = os.environ.get("PORT") or "3000"               # web和xhttp端口
 XPATH = UUID.replace("-", "")[:8]                     # 节点path，默认uuid前8位
 
